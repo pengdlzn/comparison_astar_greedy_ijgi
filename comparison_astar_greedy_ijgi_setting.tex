@@ -1,0 +1,67 @@
+
+
+%=================================================================
+\firstpage{1} 
+\makeatletter 
+\setcounter{page}{\@firstpage} 
+\makeatother
+\pubvolume{xx}
+\issuenum{1}
+\articlenumber{5}
+\pubyear{2019}
+\copyrightyear{2019}
+%\externaleditor{Academic Editor: name}
+\history{Received: date; Accepted: date; Published: date}
+%\updates{yes} % If there is an update available, un-comment this line
+
+%% MDPI internal command: uncomment if new journal that already uses continuous page numbers 
+%\continuouspages{yes}
+
+%------------------------------------------------------------------
+% The following line should be uncommented if the LaTeX file is uploaded to arXiv.org
+%\pdfoutput=1
+
+%=================================================================
+% Add packages and commands here. The following packages are loaded in our class file: fontenc, calc, indentfirst, fancyhdr, graphicx, lastpage, ifthen, lineno, float, amsmath, setspace, enumitem, mathpazo, booktabs, titlesec, etoolbox, amsthm, hyphenat, natbib, hyperref, footmisc, geometry, caption, url, mdframed, tabto, soul, multirow, microtype, tikz
+
+\usepackage{xspace}
+\usepackage{mathtools}
+\usepackage{fancyvrb} %for \begin{Verbatim} environment; color in verbatime
+%\usepackage[T1]{fontenc}
+%\usepackage{subcaption}
+%=================================================================
+%% Please use the following mathematics environments: Theorem, Lemma, Corollary, Proposition, Characterization, Property, Problem, Example, ExamplesandDefinitions, Hypothesis, Remark, Definition, Notation, Assumption
+%% For proofs, please use the proof environment (the amsthm package is loaded by the MDPI class).
+
+%so that we have more tolerance for large figures
+%large figure is less likely to push to the end of the document
+\renewcommand{\textfraction}{0.01}
+\renewcommand{\topfraction}{0.99}
+\renewcommand{\bottomfraction}{0.99}
+\renewcommand{\dbltopfraction}{0.99} % fit big float above 2-col. text
+
+\graphicspath{{images/}}
+
+\newcommand{\Astar}{A$^{\!\star}$\xspace}
+
+\newcommand{\e}[1]{\times 10^{#1}}
+\newcommand{\fig}{Figure~}
+\newcommand{\eq}{Equation~}
+\newcommand{\fo}{Formula~}
+\newcommand{\sect}{Section~}
+\newcommand{\tbl}{Table~}
+\newcommand{\chap}{Chapter~}
+\newcommand{\figs}{Figures~}
+\newcommand{\eqs}{Equations~}
+\newcommand{\fos}{Formulas~}
+\newcommand{\sects}{Sections~}
+\newcommand{\tbls}{Tables~}
+\newcommand{\chaps}{Chapters~}
+\newcommand{\eg}{e.g.,~}
+\newcommand{\ie}{i.e.,~}
+\newcommand{\p}{p.~}
+\newcommand{\pp}{pp.~}
+
+\makeatletter
+\def\verbatim@font{\normalfont\rmfamily}
+\makeatother

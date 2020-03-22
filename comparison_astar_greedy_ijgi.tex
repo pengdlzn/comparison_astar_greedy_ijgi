@@ -11,8 +11,7 @@
 
 %=================================================================
 % Full title of the paper (Capitalized)
-\Title{Paralleling Generalization Operations to Support Smooth Zooming:
-Case Study of Merging Land-Cover Areas}
+\Title{An Approach to Evaluating Merging Sequences}
 %\Title{Merging land-cover areas parallelly 
 %to support smooth zooming of web maps}
 
@@ -49,11 +48,19 @@ if there are multiple corresponding authors, add author initials) +xx-xxxx-xxx-x
 
 % Abstract (Do not insert blank lines, i.e. \\) 
 \abstract{
-abstract
+When a map is zoomed out, some generalization operators are applied 
+to simplify the map and to avoid visual clutter.
+Merging is one of the frequently applied operators.
+Many merging methods have been proposed.
+This paper contributes to quantitatively evaluate 
+sequences of merging land-cover areas.
+We try to evaluate merging sequences obtained by a greedy algorithm
+and an \astar algorithm in the aspects of type change and length change.
+We implemented our evaluations in language PostgreSQL.
 }
 
 % Keywords
-\keyword{many keywords}
+\keyword{PostgreSQL}
 
 
 
@@ -395,8 +402,31 @@ One may need to extend our method according to their demands.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% optional
 %\appendixtitles{no} %Leave argument "no" if all appendix headings stay EMPTY (then no dot is printed after "Appendix A"). If the appendix sections contain a heading then change the argument to "yes".
-%\appendix
-%\section{}
+\appendix
+\section{SQL}
+\lstinputlisting[
+           language=SQL,
+           showspaces=false,
+           showstringspaces=false,
+           basicstyle=\ttfamily,
+           numbers=left,
+           numberstyle=\tiny,
+           commentstyle=\color{gray},
+           linewidth=\textwidth,
+           gobble=2,
+           tabsize=2,
+        ]{scripts/evaluation.sql}
+
+%\begin{lstlisting}[
+%           language=SQL,
+%           showspaces=false,
+%           basicstyle=\ttfamily,
+%           numbers=left,
+%           numberstyle=\tiny,
+%           commentstyle=\color{gray}
+%        ]
+
+
 %\unskip
 %\subsection{}
 %The appendix is an optional section that can contain details and data supplemental to the main text. For example, explanations of experimental details that would disrupt the flow of the main text, but nonetheless remain crucial to understanding and reproducing the research shown; figures of replicates for experiments of which representative data is shown in the main text can be added here if brief, or as Supplementary data. Mathematical proofs of results not central to the paper can be added as an appendix.
@@ -441,6 +471,16 @@ One may need to extend our method according to their demands.
 %Reviewer 2 comments and authors’ response\\
 %Reviewer 3 comments and authors’ response
 %}
+
+
+
+
+
+
+
+
+
+
 
 
 

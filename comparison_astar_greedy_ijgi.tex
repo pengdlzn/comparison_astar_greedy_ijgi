@@ -124,7 +124,171 @@ my case study
 
 my future work
 
+\section{Evaluation}
 
+\subsection{Type Change}
+
+When we aggregate land-cover polygon~$p$ into land-cover polygon~$q$,
+the type of~$p$ is changed to the type of~$q$.  
+We define the cost of type change as
+\begin{equation}
+\label{eq:f_type}
+f_\mathrm{type}(p,q)=a_p \cdot d_\mathrm{type}(T(p),T(q)),
+\end{equation}
+where $a_p$ is the area of land-cover polygon~$p$. 
+Expressions~$T(p)$ and~$T(q)$ denote the types of the two polygons, respectively.
+Formula~$d_\mathrm{type}(T(p),T(q))$ is the distance of the two types;
+\fig\ref{fig:evaluations_type_distance} shows an example of type distances.
+
+\begin{figure*}[tb]
+\centering
+\includegraphics[page=1]{evaluations}
+\caption{An example of type distances of land-cover polygons, 
+    where each color represents a type.
+}
+\label{fig:evaluations_type_distance}
+\end{figure*}
+
+
+We have two preferences for the type change when we generate intermediate maps.
+First, the changes of each step should be small.
+Take \fig\ref{fig:evaluations} for example, the corresponding polygons of
+set~$C_{2,1}$ (the relevant places after  changing) and 
+set~$C_{1,2}$ (the relevant places before changing)
+should be similar in terms of land-cover types.
+Therefore, we define the cost of type change of a step,
+from state~$s-1$ to state~$s$, as
+\begin{equation}
+\label{eq:F_type}
+F_\mathrm{type}(s)=\sum_{i=1}^{|C_{s-1,s}|} f_\mathrm{type}(p_i,q_i),
+\end{equation}
+where corresponding polygons~$p_i$ and~$q_i$ are respectively from 
+the two sets of changed polygons~$C_{s-1,s}$ and~$C_{s,s-1}$.
+There holds~$|C_{s-1,s}| = |C_{s,s-1}|$.
+According to the type distances defined in \fig\ref{fig:evaluations_type_distance},
+we have~$F_\mathrm{type}(2)=120$
+for type changes from set~$C_{1,2}$ to set~$C_{2,1}$ 
+(see \fig\ref{fig:evaluations}), and
+we have~$F_\mathrm{type}(3)=82$
+for type changes, from set~$C_{2,3}$ to set~$C_{3,2}$.
+
+
+Our second preference for the type change is that 
+the differences between an intermediate map and the start map
+should be small.
+Take \fig\ref{fig:evaluations} for example, the corresponding polygons of
+set~$C'_{3,1}$ (the relevant places after  changing) and 
+set~$C'_{1,3}$ (the relevant places before changing)
+should be similar in terms of land-cover types.
+We define this cost, from state~$1$ to state~$s$, as
+\begin{equation}
+\label{eq:F_type_prime}
+F'_\mathrm{type}(s)=\sum_{i=1}^{|C'_{1,s}|} f_\mathrm{type}(p'_i,q'_i),
+\end{equation}
+where corresponding polygons~$p'_i$ and~$q'_i$ are respectively from 
+the two sets of changed polygons~$C'_{1,s}$ and~$C'_{s,1}$.
+There holds~$|C'_{1,s}| = |C'_{s,1}|$.
+According to the type distances defined in \fig\ref{fig:evaluations_type_distance},
+we have~$F'_\mathrm{type}(3)=172$
+for type changes, from set~$C'_{1,3}$ to set~$C'_{3,1}$
+(see \fig\ref{fig:evaluations}).
+
+\subsection{Length Change}
+
+{\color{red}the length should not decrease evenly. 
+Instead, it should decrease evenly on map.}
+
+We also have two preferences for the shape when we generate intermediate maps.
+First, the interior length should decrease evenly from the current map.
+Take \fig\ref{fig:evaluations} for example, 
+from state~$s=3$ the interior length should decrease by~$12$ at each step.
+Therefore, we define the cost of length change of a step,
+from state~$s-1$ to state~$s$, as
+\begin{equation}
+\label{eq:F_lgth}
+F_\mathrm{lgth}(s)=
+    \left(\ell_\mathrm{int}(s-1)-\ell_\mathrm{int}(s)-
+        \frac{\ell_\mathrm{int}(s-1)}{n_\mathrm{state}-s+1}\right)^2,
+\end{equation}
+where expression~$\ell_\mathrm{int}(s-1)-\ell_\mathrm{int}(s)$ 
+is the decrease of interior length from state~$s-1$ to state~$s$.
+Parameter~$n_\mathrm{state}$ denotes the total number of states.
+Expression~$\frac{\ell_\mathrm{int}(s-1)}{n_\mathrm{state}-s+1}$
+is the average decrease of interior length from state~$s-1$ 
+to a map with all the polygons merged.
+Take \fig\ref{fig:evaluations} for example,
+we have~$n_\mathrm{state}=5$ and~$F_\mathrm{lgth}(3)=\frac{16}{9}$.
+
+
+Our second preference of for the shape is that
+the interior length should decrease evenly from the start map. 
+Take \fig\ref{fig:evaluations} for example, 
+from time~$state=1$ the interior length should decrease by~$11$ at each step.
+We define this cost as
+\begin{equation}
+\label{eq:F_lgth_prime}
+F'_\mathrm{lgth}(s)=
+\left(\ell_\mathrm{int}(s-1)-\ell_\mathrm{int}(s)-
+        \frac{\ell_\mathrm{int}(1)}{n_\mathrm{state}-1}\right)^2,
+\end{equation}
+where expression~$\frac{\ell_\mathrm{int}(1)}{n_\mathrm{step}-1}$
+is the average decrease of interior length from state~$s=1$ 
+to a map with all the polygons merged.
+Take \fig\ref{fig:evaluations} for example,
+we have~$F'_\mathrm{lgth}(3)=1$.
+
+We define the total cost of the whole aggregation sequence
+based on \eqs\ref{eq:F_type}, \ref{eq:F_type_prime}, 
+\ref{eq:F_lgth}, and \ref{eq:F_lgth_prime}. 
+That is,
+\begin{equation}
+\label{eq:F}
+F = \sum_{s=2}^{n_\mathrm{state}}
+        \bigg(
+            (2-\lambda)F_\mathrm{type}(s) +
+            (2-\lambda)F'_\mathrm{type}(s) + 
+            \lambda F_\mathrm{lgth}(s) +
+            \lambda F'_\mathrm{lgth}(s)
+        \bigg),
+%F = \sum_{s=2}^{n_\mathrm{state}}
+%        \left( 
+%            (2-\lambda)F_\mathrm{type}(s) +
+%            (2-\lambda)F'_\mathrm{type}(s) + 
+%            \frac{\lambda d_\mathrm{type\_max}}{2} F_\mathrm{lgth}(s) +
+%            \frac{\lambda d_\mathrm{type\_max}}{2}F'_\mathrm{lgth}(s)
+%        \right),
+\end{equation}
+where parameter~$\lambda$ $(0\le \lambda \le 2)$ can be used to assign the importances of 
+type change and length change.
+In our experiment, we set $\lambda=1$.
+%Constant~$d_\mathrm{type\_max}$ is the maximum distance between two land-cover types,
+%which is known from input.
+%For example,
+%we have~$d_\mathrm{type\_max}=4$ for the instance of \fig\ref{fig:evaluations_type_distance}.
+%We use expression~$\frac{d_\mathrm{type\_max}}{2}$ to, hopefully, 
+%make the cost of type change and the cost of length change comparable.
+
+We use the interior length instead of the compactness to define the cost of shape
+because we think the interior length is more versatile.
+By contrast, some land-cover polygons like shapes with high compactnesses 
+(e.g., forests and lakes),
+while some other land-cover polygons like shapes with low compactnesses 
+(e.g., roads and rivers).
+
+
+\begin{figure*}[tb]
+\centering
+\includegraphics[page=2]{evaluations}
+\caption{Some examples to illustrate how to compute the costs of an aggregation sequence.
+}
+\label{fig:evaluations}
+\end{figure*}
+
+
+
+\section{Conclusion}
+We considered only two operations: split and merge.
+One may need to extend our method according to their demands.
 
 
 %When we remove a triangle by slicing the SSC, 

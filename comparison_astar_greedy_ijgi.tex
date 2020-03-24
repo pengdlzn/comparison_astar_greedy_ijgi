@@ -81,23 +81,95 @@ We implemented our evaluations in language PostgreSQL.
 
 \section{Introduction}
 
-my introduction
-
-\cite{Mackaness2017Generalization}
 
 
+
+
+ 
+The existing methods evaluate a map at a certain scale.
+This paper tries to evaluate a sequence of maps and the transitions.
+
+The aim of this paper is to test some possible evaluation methods. 
+The results do not suggest whether or not 
+the algorithms of producing the merging sequences are good.
+Those algorithm can be improved from many aspects.
+ 
+
+
+
+Apparently, evaluating the changes for zooming is a new challenge,
+which appear after dynamic maps are available.
+\citet{Ruas2001Report} categorized some aspects of evaluating map generalization.
+In the categorization are \emph{generalized data}, 
+\emph{one generalization program}, \emph{one generalization program},
+\emph{several generalization programs}, \emph{one generalization algorithms},
+and \emph{generalization process(es)}.
+
+
+
+
+
+ 
+%METHODS FOR EVALUATING THE RESULTS OF AUTOMATED GENERALIZATION 
+%Formalization and data enrichment for automated evaluation of building pattern preservation 
+%Methodology for evaluating automated map generalization in commercial software 
+ 
+ 
+ 
+ 
+ 
  
 \section{Related Work}
 \label{sec:realted_work}
 
-my Related Work
 
+
+
+
+\citet{Stoter2014Evaluation} pointed out 
+an advantage and two disadvantages of evaluation.
+The advantage is that 
+the evaluation criteria help to improve the quality of map generalization.
+A disadvantages is that 
+the generalized result may violate some other criteria 
+because the generalization process tries to fulfill the considered criteria.
+The other disadvantage is that it may be impossible to evaluate 
+the generalization results 
+obtained from different systems \citep{Ruas2001Report}.
+To overcome the problem in our case, 
+we had to do some extra work.
+The \astar algorithm was available in prototype
+\emph{ContinuousGeneralizer}\footnote{Prototype ContinuousGeneralizer
+    is open access on GitHub; 
+	see	\url{https://github.com/IGNF/ContinuousGeneralisation}.}
+We had to add a functionality 
+to write the result of the \astar algorithm to a TXT file.
+Then we read this file in prototype 
+\emph{tgap}\footnote{Prototype tgap is open access on Bitbucket; 
+	see	\url{https://bitbucket.org/bmmeijers/tgap}.}
+and save the results as tables of tGAP tree in the PostgreSQL database
+so that we can evaluate the result by a script written in 
+PostgreSQL.
+
+
+
+
+
+
+\cite{Ruas2001Report}
 
 \section{Methodology}
 \label{sec:methodology}
 
-
-my methodology
+%Regarding the persons who perform the evaluation, 
+\citet{Ruas2001Report} mentioned an advantage and a disadvantage
+when the persons who designed the system also perform the evaluation.
+The advantage is the the persons know the details of the system well.
+The disadvantage is that the persons may not be objective.
+Fortunately, some of the authors of this paper 
+participated in designing the greedy algorithm,
+while the other authors were involved in developing the \astar algorithm.
+Therefore, this paper can be objective to both algorithms.
 
 
 
@@ -403,7 +475,7 @@ One may need to extend our method according to their demands.
 %%% optional
 %\appendixtitles{no} %Leave argument "no" if all appendix headings stay EMPTY (then no dot is printed after "Appendix A"). If the appendix sections contain a heading then change the argument to "yes".
 \appendix
-\section{SQL}
+\section{Script in PostgreSQL}
 \lstinputlisting[
            language=SQL,
            showspaces=false,

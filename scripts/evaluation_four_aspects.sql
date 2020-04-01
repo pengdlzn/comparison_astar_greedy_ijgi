@@ -1,4 +1,4 @@
-drop function if exists compute_cost_type_change(tbl_name text);
+DROP FUNCTION IF EXISTS compute_cost_type_change(tbl_name text);
 --CREATE OR REPLACE FUNCTION compute_cost_type_change(tbl_name text) RETURNS setof double precision as
 CREATE OR REPLACE FUNCTION compute_cost_type_change(tbl_name text) RETURNS double precision AS
     $$

@@ -52,10 +52,10 @@ When a map is zoomed out, some generalization operators are applied
 to simplify the map and to avoid visual clutter.
 Merging is one of the frequently applied operators.
 Many merging methods have been proposed.
-This paper contributes to quantitatively evaluate 
+This paper contributes to quantitatively evaluating 
 sequences of merging land-cover areas.
 We try to evaluate merging sequences obtained by a greedy algorithm
-and an \astar algorithm in the aspects of type change and length change.
+and an \astar algorithm in the aspects of class change and length change.
 We implemented our evaluations in language PostgreSQL.
 }
 
@@ -125,7 +125,8 @@ and \emph{generalization process(es)}.
 
 
 
-
+\citet{Stoter2014Evaluation} gave a very good review 
+of evaluation in map generalization.
 \citet{Stoter2014Evaluation} pointed out 
 an advantage and two disadvantages of evaluation.
 The advantage is that 
@@ -156,10 +157,19 @@ PostgreSQL.
 
 
 
-\cite{Ruas2001Report}
+\citet{Ruas2001Report}
 
-\section{Methodology}
-\label{sec:methodology}
+\citet{HaunertWolff2010AreaAgg}
+
+\citet{Peng2017AStar}
+
+
+%\section{Methodology}
+%\label{sec:methodology}
+
+
+\section{Evaluation}
+\label{sec:evaluation}
 
 %Regarding the persons who perform the evaluation, 
 \citet{Ruas2001Report} mentioned an advantage and a disadvantage
@@ -171,106 +181,198 @@ participated in designing the greedy algorithm,
 while the other authors were involved in developing the \astar algorithm.
 Therefore, this paper can be objective to both algorithms.
 
+Let $M_\mathrm{seq} = \{M_1, M_2, \dots, M_s, \dots\}$ be the map
+at different states obtained from 
+applying a sequence of merging operations.
+Let $S_\mathrm{seq} = \{1, 2, \dots, s, \dots\}$ be the set of states.
+For example, \fig\ref{fig:evaluations} has 
+$M_\mathrm{seq} = \{M_1, M_2, M_3, M_4, M_5\}$ and
+$S_\mathrm{seq} = \{1, 2, 3, 4, 5\}$.
+%For the sake of convenience, we sometimes also refer to~$M_s$ as a map. 
 
 
 
-\subsection{A Greedy Algorithm}
-\label{sec:greedy_algo}
+\begin{figure*}[tb]
+\centering
+\includegraphics[page=2]{evaluations}
+\caption{Some examples to illustrate how to compute the costs of an aggregation sequence.
+}
+\label{fig:evaluations}
+\end{figure*}
 
 
-my algorithm
-
-
-
-\section{Case Study}
-\label{sec:case_study}
-
-
-my case study
+\subsection{Class Change}
 
 
 
+We have two preferences for the class change 
+when generating intermediate states of the map.
+First, the difference between an intermediate map and 
+the previous map should be small 
+(see \sect\ref{sec:class_change_previous}).
+We have this preference because a smaller difference
+will distract a user less.
+Second, the difference between an intermediate map and the start map
+should be small (see \sect\ref{sec:class_change_start}).
+The preference is because we hope that the area classes of an intermediate map 
+should be consistent with the start map as much as possible.
+According to the preferences,
+we define two cost functions, where the function returns a larger value
+if the difference is bigger.
 
-
-\section{Concluding Remarks}
-\label{sec:concluding_remarks}
-
-\subsection{Conclusion}
-
-
-
-\subsection{Future Work}
-
-my future work
-
-\section{Evaluation}
-
-\subsection{Type Change}
-
-When we aggregate land-cover polygon~$p$ into land-cover polygon~$q$,
-the type of~$p$ is changed to the type of~$q$.  
-We define the cost of type change as
+This paper considers only the merging operation.
+Therefore, a generated map always has the same size as the start map.
+The difference between two maps can be computed by
 \begin{equation}
-\label{eq:f_type}
-f_\mathrm{type}(p,q)=a_p \cdot d_\mathrm{type}(T(p),T(q)),
+\label{eq:f_integral}
+f_\mathrm{class} (s_i, s_j) = \int_{R_\mathrm{map}}
+d_\mathrm{class}(c_i,c_j) da,
 \end{equation}
-where $a_p$ is the area of land-cover polygon~$p$. 
-Expressions~$T(p)$ and~$T(q)$ denote the types of the two polygons, respectively.
-Formula~$d_\mathrm{type}(T(p),T(q))$ is the distance of the two types;
-\fig\ref{fig:evaluations_type_distance} shows an example of type distances.
+where~$R_\mathrm{map}$ denotes the region of the map,
+symbol~$da$ is the differential of the region,
+variables~$c_i$ and~$c_j$ are respectively
+the two classes of place~$da$ on the two maps, 
+and function~$d_\mathrm{class}(c_i,c_j)$ 
+returns the distance between the two classes.
+\fig\ref{fig:evaluations_class_distance} shows an example of class distances.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% distance --> cost ?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure*}[tb]
 \centering
 \includegraphics[page=1]{evaluations}
-\caption{An example of type distances of land-cover polygons, 
-    where each color represents a type.
+\caption{An example of class distances of land-cover areas, 
+    where each color represents a class.
 }
-\label{fig:evaluations_type_distance}
+\label{fig:evaluations_class_distance}
 \end{figure*}
 
 
-We have two preferences for the type change when we generate intermediate maps.
-First, the changes of each step should be small.
-Take \fig\ref{fig:evaluations} for example, the corresponding polygons of
-set~$C_{2,1}$ (the relevant places after  changing) and 
-set~$C_{1,2}$ (the relevant places before changing)
-should be similar in terms of land-cover types.
-Therefore, we define the cost of type change of a step,
-from state~$s-1$ to state~$s$, as
-\begin{equation}
-\label{eq:F_type}
-F_\mathrm{type}(s)=\sum_{i=1}^{|C_{s-1,s}|} f_\mathrm{type}(p_i,q_i),
-\end{equation}
-where corresponding polygons~$p_i$ and~$q_i$ are respectively from 
-the two sets of changed polygons~$C_{s-1,s}$ and~$C_{s,s-1}$.
-There holds~$|C_{s-1,s}| = |C_{s,s-1}|$.
-According to the type distances defined in \fig\ref{fig:evaluations_type_distance},
-we have~$F_\mathrm{type}(2)=120$
-for type changes from set~$C_{1,2}$ to set~$C_{2,1}$ 
-(see \fig\ref{fig:evaluations}), and
-we have~$F_\mathrm{type}(3)=82$
-for type changes, from set~$C_{2,3}$ to set~$C_{3,2}$.
 
 
-Our second preference for the type change is that 
-the differences between an intermediate map and the start map
-should be small.
-Take \fig\ref{fig:evaluations} for example, the corresponding polygons of
-set~$C'_{3,1}$ (the relevant places after  changing) and 
-set~$C'_{1,3}$ (the relevant places before changing)
-should be similar in terms of land-cover types.
-We define this cost, from state~$1$ to state~$s$, as
+
+
+\subsubsection{Class Change Against Previous State}
+\label{sec:class_change_previous}
+
+When we merge land-cover area~$p$ into land-cover area~$q$,
+the class of~$p$ is changed to the class of~$q$.
+Correspondingly, the map transits from state~$s-1$ to state~$s$.
+Then \eq\ref{eq:f_integral} can be represented by
 \begin{equation}
-\label{eq:F_type_prime}
-F'_\mathrm{type}(s)=\sum_{i=1}^{|C'_{1,s}|} f_\mathrm{type}(p'_i,q'_i),
+\label{eq:f_to_previous}
+f_\mathrm{class}({s-1},s)=a_p \cdot d_\mathrm{class}(c(p),c(q)),
 \end{equation}
-where corresponding polygons~$p'_i$ and~$q'_i$ are respectively from 
-the two sets of changed polygons~$C'_{1,s}$ and~$C'_{s,1}$.
-There holds~$|C'_{1,s}| = |C'_{s,1}|$.
-According to the type distances defined in \fig\ref{fig:evaluations_type_distance},
-we have~$F'_\mathrm{type}(3)=172$
-for type changes, from set~$C'_{1,3}$ to set~$C'_{3,1}$
-(see \fig\ref{fig:evaluations}).
+%where variables~$M_{s-1}$ and~$M_s$ represent states~$s-1$ and~$s$ of a map.
+where variable~$a_p$ is the size of land-cover area~$p$. 
+Expressions~$c(p)$ and~$c(q)$ denote the classes of the two areas, respectively.
+Formula~$d_\mathrm{class}(c(p),c(q))$ is the distance of the two classes.
+The total cost of all the steps can be computed by
+\begin{equation}
+\label{eq:F_to_previous}
+F_\mathrm{class} (S_\mathrm{seq}) =
+\sum\limits_{i=2}^{|S_\mathrm{seq}|} f_\mathrm{class}(s_{i-1},s_i),
+\end{equation}
+where length~$|S_\mathrm{seq}|$ is the number of elements in set~$S_\mathrm{seq}$.
+
+%If there are~$n$ land-cover areas on a map and 
+%we merge 
+%
+%
+%
+%Take \fig\ref{fig:evaluations} for example, the corresponding areas of
+%set~$C_{2,1}$ (the relevant places after  changing) and 
+%set~$C_{1,2}$ (the relevant places before changing)
+%should be similar in terms of land-cover classes.
+%Therefore, we define the cost of class change of a step,
+%from state~$s-1$ to state~$s$, as
+%\begin{equation}
+%\label{eq:F_class}
+%F_\mathrm{class}(s)=\sum_{i=1}^{|C_{s-1,s}|} f_\mathrm{class}(p_i,q_i),
+%\end{equation}
+%where corresponding areas~$p_i$ and~$q_i$ are respectively from 
+%the two sets of changed areas~$C_{s-1,s}$ and~$C_{s,s-1}$.
+%There holds~$|C_{s-1,s}| = |C_{s,s-1}|$.
+%According to the class distances defined in \fig\ref{fig:evaluations_class_distance},
+%we have~$F_\mathrm{class}(2)=120$
+%for class changes from set~$C_{1,2}$ to set~$C_{2,1}$ 
+%(see \fig\ref{fig:evaluations}), and
+%we have~$F_\mathrm{class}(3)=82$
+%for class changes, from set~$C_{2,3}$ to set~$C_{3,2}$.
+
+\subsubsection{Class Change Against Start Map}
+\label{sec:class_change_start}
+According to \eq\ref{eq:f_integral}, 
+this cost can be obtained from computing~$f_\mathrm{class} (0, s)$.
+That is, the difference between the map at state~$0$ (start map) and at state~$s$.
+As we need to compute the total cost of a sequence of maps against the start map,
+cost~$f_\mathrm{class} (0, s-1)$ should be computed before~$f_\mathrm{class} (0, s)$.
+We reuse the already computed cost~$f_\mathrm{class} (0, s-1)$ 
+to save some computation time.
+In order to do so,
+we need to define a function to compute the cost of 
+an area against its components on start map.
+For example, area~8 in \fig\ref{fig:evaluations} 
+has areas~3, 4, and~5 as its components on the start map. 
+Let~$r$ be the area, and let~$U$ be the set of components,
+then we have cost
+\begin{equation}
+\label{eq:f_set}
+g_\mathrm{class} (r) = 
+\sum\limits_{u \in U} a_u \cdot d_\mathrm{class}(c(u),c(r)),
+\end{equation}
+where, similar to \eq\ref{eq:f_to_previous},
+variable~$a_u$ is the size of land-cover area~$u$. 
+Expressions~$c(u)$ and~$c(r)$ denote the classes of the two areas, respectively.
+
+
+\begin{equation}
+\label{eq:F_to_start}
+f_\mathrm{class}(0,s)=f_\mathrm{class} (0, s-1) 
++ g_\mathrm{class} (r)
+- g_\mathrm{class} (p)
+- g_\mathrm{class} (q),
+\end{equation}
+where function~$f_\mathrm{class} (r)$ 
+computes the cost of area~$r$'s class change against the start map.
+Area~$r$ is the combination of a set of areas on the start map.
+
+
+
+
+%We can take advantage of this  
+%
+%This computation can take advantage of~$f_\mathrm{class} (M_1, M_{s-1})$,
+%which has already been computed.
+%\begin{equation}
+%\label{eq:F_to_start}
+%f_\mathrm{class}(M_{s-1},M_s)=a_p \cdot d_\mathrm{class}(c(p),c(q)),
+%\end{equation}
+
+%Take \fig\ref{fig:evaluations} for example, the corresponding areas of
+%set~$C_{3,1}$ (the relevant places after  changing) and 
+%set~$C_{1,3}$ (the relevant places before changing)
+%should be similar in terms of land-cover classes.
+%We define this cost, from state~$1$ to state~$s$, as
+%\begin{equation}
+%\label{eq:F_class_prime}
+%F'_\mathrm{class}(s)=\sum_{i=1}^{|C'_{1,s}|} f_\mathrm{class}(p'_i,q'_i),
+%\end{equation}
+%where corresponding areas~$p'_i$ and~$q'_i$ are respectively from 
+%the two sets of changed areas~$C'_{1,s}$ and~$C'_{s,1}$.
+%There holds~$|C'_{1,s}| = |C'_{s,1}|$.
+%According to the class distances defined in \fig\ref{fig:evaluations_class_distance},
+%we have~$F'_\mathrm{class}(3)=172$
+%for class changes, from set~$C'_{1,3}$ to set~$C'_{3,1}$
+%(see \fig\ref{fig:evaluations}).
+
+
+
+
+
+
+
 
 \subsection{Length Change}
 
@@ -294,7 +396,7 @@ is the decrease of interior length from state~$s-1$ to state~$s$.
 Parameter~$n_\mathrm{state}$ denotes the total number of states.
 Expression~$\frac{\ell_\mathrm{int}(s-1)}{n_\mathrm{state}-s+1}$
 is the average decrease of interior length from state~$s-1$ 
-to a map with all the polygons merged.
+to a map with all the areas merged.
 Take \fig\ref{fig:evaluations} for example,
 we have~$n_\mathrm{state}=5$ and~$F_\mathrm{lgth}(3)=\frac{16}{9}$.
 
@@ -312,117 +414,75 @@ F'_\mathrm{lgth}(s)=
 \end{equation}
 where expression~$\frac{\ell_\mathrm{int}(1)}{n_\mathrm{step}-1}$
 is the average decrease of interior length from state~$s=1$ 
-to a map with all the polygons merged.
+to a map with all the areas merged.
 Take \fig\ref{fig:evaluations} for example,
 we have~$F'_\mathrm{lgth}(3)=1$.
 
 We define the total cost of the whole aggregation sequence
-based on \eqs\ref{eq:F_type}, \ref{eq:F_type_prime}, 
+based on \eqs\ref{eq:F_class}, \ref{eq:F_class_prime}, 
 \ref{eq:F_lgth}, and \ref{eq:F_lgth_prime}. 
 That is,
 \begin{equation}
 \label{eq:F}
 F = \sum_{s=2}^{n_\mathrm{state}}
         \bigg(
-            (2-\lambda)F_\mathrm{type}(s) +
-            (2-\lambda)F'_\mathrm{type}(s) + 
+            (2-\lambda)F_\mathrm{class}(s) +
+            (2-\lambda)F'_\mathrm{class}(s) + 
             \lambda F_\mathrm{lgth}(s) +
             \lambda F'_\mathrm{lgth}(s)
         \bigg),
 %F = \sum_{s=2}^{n_\mathrm{state}}
 %        \left( 
-%            (2-\lambda)F_\mathrm{type}(s) +
-%            (2-\lambda)F'_\mathrm{type}(s) + 
-%            \frac{\lambda d_\mathrm{type\_max}}{2} F_\mathrm{lgth}(s) +
-%            \frac{\lambda d_\mathrm{type\_max}}{2}F'_\mathrm{lgth}(s)
+%            (2-\lambda)F_\mathrm{class}(s) +
+%            (2-\lambda)F'_\mathrm{class}(s) + 
+%            \frac{\lambda d_\mathrm{class\_max}}{2} F_\mathrm{lgth}(s) +
+%            \frac{\lambda d_\mathrm{class\_max}}{2}F'_\mathrm{lgth}(s)
 %        \right),
 \end{equation}
 where parameter~$\lambda$ $(0\le \lambda \le 2)$ can be used to assign the importances of 
-type change and length change.
+class change and length change.
 In our experiment, we set $\lambda=1$.
-%Constant~$d_\mathrm{type\_max}$ is the maximum distance between two land-cover types,
+%Constant~$d_\mathrm{class\_max}$ is the maximum distance between two land-cover classes,
 %which is known from input.
 %For example,
-%we have~$d_\mathrm{type\_max}=4$ for the instance of \fig\ref{fig:evaluations_type_distance}.
-%We use expression~$\frac{d_\mathrm{type\_max}}{2}$ to, hopefully, 
-%make the cost of type change and the cost of length change comparable.
+%we have~$d_\mathrm{class\_max}=4$ for the instance of \fig\ref{fig:evaluations_class_distance}.
+%We use expression~$\frac{d_\mathrm{class\_max}}{2}$ to, hopefully, 
+%make the cost of class change and the cost of length change comparable.
 
 We use the interior length instead of the compactness to define the cost of shape
 because we think the interior length is more versatile.
-By contrast, some land-cover polygons like shapes with high compactnesses 
+By contrast, some land-cover areas like shapes with high compactnesses 
 (e.g., forests and lakes),
-while some other land-cover polygons like shapes with low compactnesses 
+while some other land-cover areas like shapes with low compactnesses 
 (e.g., roads and rivers).
 
 
-\begin{figure*}[tb]
-\centering
-\includegraphics[page=2]{evaluations}
-\caption{Some examples to illustrate how to compute the costs of an aggregation sequence.
-}
-\label{fig:evaluations}
-\end{figure*}
 
 
 
-\section{Conclusion}
-We considered only two operations: split and merge.
-One may need to extend our method according to their demands.
+
+\section{Case Study}
+\label{sec:case_study}
 
 
-%When we remove a triangle by slicing the SSC, 
-%we may want to keep three vertices of the triangle 
-%instead of making four vertices.
-%In this case, the polyhedron (with five faces) should have curly edges,
-%which is also known as a \emph{curved polyhedron}.
-%The slopes of curly edges need to be studied.
+my case study
 
 
 
 
 
+\section{Concluding Remarks}
+\label{sec:concluding_remarks}
+
+\subsection{Conclusion}
 
 
 
+\subsection{Future Work}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%Some research questions are as follows.
-%What aspects should we optimize 
-%(e.g., minimizing the number of merging events or 
-%assigning similar numbers of merging steps to each event)?
-%What algorithm should we use 
-%(e.g., dynamic programming, \Astar, or integer linear programming)?
-%How much time is gained for users to observe the merging steps on the screen?
-%How to store the parallel merging steps?
+We will consider in the evaluation 
+other generalization operations, 
+such as area splitting and vertex removing.
 
 
 
@@ -475,14 +535,16 @@ One may need to extend our method according to their demands.
 %%% optional
 %\appendixtitles{no} %Leave argument "no" if all appendix headings stay EMPTY (then no dot is printed after "Appendix A"). If the appendix sections contain a heading then change the argument to "yes".
 \appendix
-\section{Script in PostgreSQL}
+\section{Script in Language PostgreSQL}
 \lstinputlisting[
            language=SQL,
            showspaces=false,
            showstringspaces=false,
-           basicstyle=\ttfamily,
-           numbers=left,
-           numberstyle=\tiny,
+%           basicstyle=\ttfamily,
+%           basicstyle=\small,
+           basicstyle=\footnotesize,
+%           numbers=left,
+%           numberstyle=\tiny,
            commentstyle=\color{gray},
            linewidth=\textwidth,
            gobble=2,
